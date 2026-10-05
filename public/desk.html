@@ -46,7 +46,7 @@ textarea::placeholder{color:#8f8a7c;font-weight:500}
 .ex{display:flex;flex-direction:column;gap:12px;padding-top:6px}
 .ex .lab{margin-bottom:2px}
 .scrap{all:unset;cursor:pointer;display:block;background:#f6e27a;color:#2a2410;padding:12px 14px 12px;font:700 21px/1.1 'Caveat',cursive;max-width:310px;box-shadow:0 2px 3px var(--sh);transform:rotate(var(--r));transition:transform .2s cubic-bezier(.3,1.6,.5,1),box-shadow .2s;position:relative}
-.scrap:nth-child(3){background:#bfe0c8}.scrap:nth-child(4){background:#ffc2a0}
+.scrap:nth-of-type(2){background:#bfe0c8}.scrap:nth-of-type(3){background:#ffc2a0}
 .scrap:hover{transform:rotate(0) translateY(-4px) scale(1.03);box-shadow:0 12px 16px -6px var(--sh)}
 .scrap:active{transform:rotate(var(--r)) scale(.97)}
 .scrap:focus-visible{outline:2px dashed var(--red);outline-offset:3px}
@@ -177,6 +177,71 @@ mark{background:none;color:inherit;text-decoration:underline wavy var(--red);tex
 .board{transform-style:flat!important}
 .notes{transform-style:preserve-3d}
 #yarn{transform:translateZ(40px)} /* keeps the yarn in front of the cards */
+/* ===== Rebuttal range: gun, attack menu, bullet holes, radars ===== */
+.range{padding:14px 16px 16px;border:2px dashed var(--lead);border-radius:6px;max-width:330px;position:relative;margin-bottom:14px}
+.rtxt{margin:6px 0 2px;font:700 23px/1.1 'Caveat',cursive;color:var(--txt)}
+.gun{all:unset;display:block;width:150px;margin:8px 0 2px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:transform .2s cubic-bezier(.3,1.6,.5,1),opacity .2s;filter:drop-shadow(0 6px 3px var(--sh))}
+.gun svg{display:block;width:100%;height:auto;pointer-events:none}
+.gun:hover{transform:rotate(-6deg) translateY(-3px)}.gun:focus-visible{outline:2px dashed var(--red);outline-offset:6px}
+.gun.away{opacity:.22}.gun,.gun:hover{cursor:grab!important}
+body.aiming,body.aiming *{cursor:crosshair!important;-webkit-user-select:none;user-select:none}
+#ghostGun{position:fixed;left:0;top:0;width:150px;height:90px;z-index:1000;pointer-events:none;will-change:transform;filter:drop-shadow(0 14px 8px rgba(0,0,0,.35))}
+#ghostGun svg.g{display:block;width:100%;height:auto;transform-origin:78% 62%}
+#ghostGun.back{transition:transform .5s cubic-bezier(.3,1.15,.4,1),opacity .5s}
+#ghostGun.kick svg.g{animation:kick .34s ease-out}
+@keyframes kick{30%{transform:rotate(-17deg) translateX(14px)}}
+#ghostGun .xh{position:absolute;left:-8px;top:17px;width:28px;height:28px;border:2px solid var(--red);border-radius:50%;opacity:.9}
+#ghostGun .xh:before,#ghostGun .xh:after{content:"";position:absolute;background:var(--red)}
+#ghostGun .xh:before{left:50%;top:-6px;bottom:-6px;width:2px;margin-left:-1px}
+#ghostGun .xh:after{top:50%;left:-6px;right:-6px;height:2px;margin-top:-1px}
+#ghostGun .fl{position:absolute;left:-26px;top:-1px;width:64px;height:64px;opacity:0}
+#ghostGun .fl.on{animation:flash .3s ease-out}
+@keyframes flash{0%{opacity:1;transform:scale(.3)}40%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.5)}}
+.aim{outline:3px dashed var(--red);outline-offset:7px}
+.hole{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;pointer-events:none;z-index:9;
+  background:radial-gradient(circle,#0b0805 0 36%,#33261a 40% 52%,transparent 58%);animation:holeIn .26s cubic-bezier(.2,1.6,.4,1) both}
+.hole:before{content:"";position:absolute;inset:-10px;border-radius:50%;
+  background:conic-gradient(from 12deg,transparent 0 8%,#0005 8% 10%,transparent 10% 30%,#0005 30% 31.5%,transparent 31.5% 55%,#0004 55% 57%,transparent 57% 80%,#0005 80% 81.5%,transparent 81.5%);
+  -webkit-mask:radial-gradient(circle,#000 28%,transparent 70%);mask:radial-gradient(circle,#000 28%,transparent 70%)}
+@keyframes holeIn{from{transform:scale(2.6);opacity:0}}
+.hit{animation:hit .36s}
+@keyframes hit{25%{translate:6px -3px}55%{translate:-4px 2px}80%{translate:2px 0}}
+.btn.sm{font-size:13px;padding:9px 14px}
+.atk{position:relative;margin-top:12px}
+.menu{position:absolute;left:0;top:calc(100% + 8px);z-index:30;width:min(300px,calc(100vw - 48px));background:var(--paper);color:#241f1a;padding:8px;
+  box-shadow:0 2px 3px var(--sh),0 20px 30px -10px var(--sh);transform:rotate(-.6deg);animation:fade .2s}
+.menu[hidden]{display:none}
+.menu button{all:unset;box-sizing:border-box;display:block;width:100%;padding:8px 10px;cursor:pointer;border-radius:2px;-webkit-tap-highlight-color:transparent}
+.menu button b{font:13px 'Special Elite',monospace;letter-spacing:.08em;text-transform:uppercase}
+.menu button span{display:block;font-size:15px;line-height:1.25;color:#5d5a52}
+.menu button:hover,.menu button[aria-checked=true]{background:#f6e27a}
+.menu button:focus-visible{outline:2px dashed var(--red)}
+#rstat{display:block;margin-top:10px;min-height:16px}
+#rb{padding:46px 0 10px}
+.rbgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:34px;margin-top:26px;align-items:start}
+@media (max-width:820px){.rbgrid{grid-template-columns:1fr}}
+.tgt{transform:rotate(-.4deg);font-size:18px}.tgtx{margin-top:6px;white-space:pre-wrap}
+.rtext{font-size:21px;line-height:1.4;margin-top:8px}
+.interp-sm{margin-top:12px;max-width:760px;font-size:18px}
+.rcard{background:var(--paper);color:#241f1a;padding:12px 12px 14px;margin-top:10px;box-shadow:0 2px 3px var(--sh),0 18px 26px -14px var(--sh)}
+.rcard .lab{color:#5d5a52}
+.radar{display:block;width:100%;height:auto;max-height:400px}
+.radar .rg{fill:none;stroke:#241f1a30;stroke-width:1}.radar .rg:last-of-type{stroke:#241f1a66}
+.radar .sp{stroke:#241f1a26;stroke-width:1}
+.radar .rl{font:11px 'Special Elite',monospace;fill:#241f1a}
+.rs{animation:grow .7s cubic-bezier(.2,.9,.3,1) both}
+@keyframes grow{from{transform:scale(0);opacity:0}}
+.lg{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px;font:12px 'Special Elite',monospace}
+.lg i{display:inline-block;width:16px;height:4px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.minis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.mini{all:unset;box-sizing:border-box;display:block;background:var(--paper);color:#241f1a;padding:6px 4px 8px;text-align:center;font:11px 'Special Elite',monospace;
+  box-shadow:0 2px 3px var(--sh);transition:transform .2s,outline-color .2s;outline:2px solid transparent;-webkit-tap-highlight-color:transparent}
+button.mini{cursor:pointer}button.mini:hover{transform:translateY(-3px)}
+.mini[aria-pressed=true]{outline-color:var(--red);transform:translateY(-3px)}
+.mini .radar{max-height:none}
+.mini span{display:block;margin-top:2px}
+td.up{color:var(--red);font-weight:bold}
 </style></head>
 <body>
 <div class="wrap">
@@ -195,9 +260,41 @@ mark{background:none;color:inherit;text-decoration:underline wavy var(--red);tex
         <select id="mdl" aria-label="Model"><option value="26b">Gemma 26B · fast</option><option value="31b">Gemma 31B · deeper</option></select></div>
       <div class="err" id="err" role="alert"></div><div class="lab" id="stat" aria-live="polite"></div>
     </div>
-    <div class="ex" id="ex"><span class="lab">or grab a scrap ↓</span></div>
+    <div class="ex" id="ex"><div class="range" id="range">
+        <span class="lab">rebuttal range</span>
+        <p class="rtxt">Drag the gun onto an argument.<br>Pull the trigger. Get rebuttals.</p>
+        <button class="gun" id="gun" aria-label="Rebuttal gun. Drag it onto your argument to fire, or press Enter to fire at the pad."><svg viewBox="0 0 150 90" aria-hidden="true"><g stroke="#1f2a44" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M104 40 L132 40 Q139 40 137 47 L127 82 Q125 87 119 87 L103 87 Q97 87 98.5 81 Z" fill="#a97f52"/><path d="M60 24 H112 Q125 24 125 35 V42 H104 L98 53 H78 L74 42 H60 Z" fill="#8a877e"/><rect x="6" y="24" width="60" height="14" rx="3" fill="#3a4663"/><rect x="8" y="17" width="7" height="8" rx="1.5" fill="#3a4663"/><rect x="62" y="18" width="30" height="26" rx="5" fill="#a8a498"/><path d="M72 20v22M82 20v22" fill="none" stroke-width="1.6"/><path d="M116 25 L124 11 L131 16 L125 29 Z" fill="#3a4663"/><path d="M78 42 Q80 63 99 58 L101 46" fill="none"/><path d="M93 45 L89 55" fill="none"/><rect x="7" y="29" width="58" height="3.4" fill="#c8372d" stroke="none"/></g></svg></button>
+        <div class="atk"><button class="btn ghost sm" id="atkBtn" aria-haspopup="true" aria-expanded="false">⚔ Attack: <b id="atkName">Surprise me</b> ▾</button><div class="menu" id="atkMenu" role="menu" hidden></div></div>
+        <span class="lab" id="rstat" aria-live="polite"></span>
+        <div class="err" id="rerr" role="alert"></div>
+      </div>
+      
+<span class="lab">or grab a scrap ↓</span></div>
   </div>
 </header>
+
+<section id="rb" hidden aria-live="polite">
+  <span class="lab">The range</span>
+  <h2>Rebuttals,<br>fired.</h2>
+  <div class="interp" id="rbMeta"></div>
+  <div class="err" id="rerr2" role="alert"></div>
+  <div class="rbgrid">
+    <div>
+      <div class="card tgt" id="rbTgt"></div>
+      <div class="trail" id="rbTabs" role="group" aria-label="Rebuttal"></div>
+      <div class="card" id="rbCard"></div>
+    </div>
+    <div>
+      <span class="lab">Stats — argument vs rebuttal</span>
+      <div class="rcard" id="rbRadar"></div>
+      <div class="minis" id="rbMinis"></div>
+      <div id="rbTbl"></div>
+    </div>
+  </div>
+  <div class="lab" style="margin-top:30px">Re-aim with a different attack</div>
+  <div class="chips" id="rbAtk" style="margin-top:8px"></div>
+  <div class="after" style="margin-top:20px"><button class="btn ghost" id="rbAgain">↻ Fire again</button><button class="btn ghost" id="rbCopy">⧉ Copy rebuttals</button><button class="btn ghost" id="rbClose">✕ Close range</button></div>
+</section>
 
 <main id="res" hidden>
   <span class="lab">The board</span>
@@ -287,7 +384,7 @@ function hl(t,f){const sp=[];f.forEach((x,i)=>{const k=x.ex?t.indexOf(x.ex):-1;i
 sp.forEach(([a,b,i])=>{if(a<p)return;o+=esc(t.slice(p,a))+`<mark data-i="${i}" tabindex="0" title="${esc(f[i].name)}">${esc(t.slice(a,b))}</mark>`;p=b});return o+esc(t.slice(p))}
 function bindMarks(){$('card').querySelectorAll('mark').forEach(m=>{const go=()=>{const t=document.querySelector('.ftag[data-i="'+m.dataset.i+'"]');t&&t.click()};m.onclick=go;m.onkeydown=e=>{if(e.key=='Enter')go()}})}
 function scoreDraw(){const s=D[sel],t=s.total;
-  $('score').innerHTML=`<div class="tot">${t}<small> / 12</small></div>`+DIMS.map(([k,l])=>`<button class="bar" data-k="${k}"><span>${l}</span><span class="segs">${[0,1,2,3].map(j=>`<i style="--k:${j}" class="${j<s.scores[k].v?'':'e'}" data-f="${j<s.scores[k].v}"></i>`).join('')}</span></button>`).join('')+`<div class="note-line" id="nl">tap a bar for the reason ↑</div>`;
+  $('score').innerHTML=`<div class="tot">${t}<small> / 12</small></div>`+DIMS.map(([k,l])=>`<button class="bar" data-k="${k}"><span>${l}</span><span class="segs">${[0,1,2,3].map(j=>`<i style="--k:${j}" class="${j<s.scores[k].v?'':'e'}" data-f="${j<s.scores[k].v}"></i>`).join('')}</span></button>`).join('')+`<div class="note-line" id="nl">tap a bar for the reason ↑</div>`+stageRadar();
   $('score').querySelectorAll('.bar').forEach(b=>{const show=()=>{$('nl').textContent=s.scores[b.dataset.k].note||'—'};b.onclick=show;b.onmouseenter=show});
   requestAnimationFrame(()=>requestAnimationFrame(()=>$('score').querySelectorAll('i[data-f=true]').forEach(i=>i.classList.add('f'))))}
 function falDraw(){const f=D[sel].fallacies;
@@ -340,5 +437,117 @@ const t=performance.now(),d=Math.hypot(px-lx,py-ly),sp=d/Math.max(1,t-lt);hue=(h
 push({x:px,y:py,t,h:hue,w:Math.max(.8,3.2-sp*1.6),k:!lt||t-lt>120});lx=px;ly=py;lt=t}});
 bd.addEventListener('pointerleave',()=>{lt=0;nt.style.transform=''});
 })();
+</script>
+<script>
+/* ===== Rebuttal range: drag the gun onto an argument, pick an attack, read the rebuttals + radar stats ===== */
+const AX=[['logic','Logic'],['evidence','Evidence'],['clarity','Clarity'],['relevance','Relevance'],['impact','Impact'],['resilience','Resilience']];
+const ATK={mixed:['Surprise me','Three different lines, strongest first.'],logic:['Logical flaws','Gaps between premises and conclusion.'],evidence:['Evidence challenge','What is asserted but not shown.'],counterexample:['Counterexample','Cases where it fails.'],reductio:['Reductio','Follow it somewhere absurd, fairly.'],values:['Values & ethics','What it costs, and who pays.'],practical:['Feasibility','Trade-offs and side effects.']};
+const SC=['#8f8a7c','#3a6ea5','#c8372d'];
+let atk='mixed',R=null,rsel=0,T=null,rbusy=false;
+
+/* radar chart: ser=[{v:[...],c:color,fo:fillOpacity,w:strokeWidth,dash}], same axes for every series */
+function radar(ser,o={}){const ax=o.ax||AX,max=o.max||10,steps=o.steps||5,S=o.size||300,lab=o.labels!==false,n=ax.length,H=S,W=lab?S+96:S,m=lab?40:12,R0=S/2-m,cx=W/2,cy=H/2;
+  const P=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n,r=R0*v/max;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]};
+  const f=q=>q.toFixed(1),poly=v=>v.map((x,i)=>P(i,x).map(f).join(',')).join(' ');
+  const rings=Array.from({length:steps},(_,j)=>`<polygon class="rg" points="${poly(ax.map(()=>max*(j+1)/steps))}"/>`).join('');
+  const spokes=ax.map((_,i)=>{const[x,y]=P(i,max);return`<line class="sp" x1="${f(cx)}" y1="${f(cy)}" x2="${f(x)}" y2="${f(y)}"/>`}).join('');
+  const sers=ser.map((s,k)=>`<g class="rs" style="transform-origin:${f(cx)}px ${f(cy)}px;animation-delay:${k*110}ms"><polygon points="${poly(s.v)}" fill="${s.c}" fill-opacity="${s.fo??.22}" stroke="${s.c}" stroke-width="${s.w||2.4}" stroke-linejoin="round"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>${lab?s.v.map((x,i)=>{const[px,py]=P(i,x);return`<circle cx="${f(px)}" cy="${f(py)}" r="3.2" fill="${s.c}"/>`}).join(''):''}</g>`).join('');
+  const L=lab?ax.map(([,t],i)=>{const a=-Math.PI/2+i*2*Math.PI/n,cs=Math.cos(a),sn=Math.sin(a);return`<text class="rl" x="${f(cx+(R0+12)*cs)}" y="${f(cy+(R0+12)*sn+4)}" text-anchor="${Math.abs(cs)<.2?'middle':cs>0?'start':'end'}">${t}</text>`}).join(''):'';
+  return`<svg class="radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.alt||'Radar chart')}">${rings}${spokes}${sers}${L}</svg>`}
+const avg=v=>(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1);
+const vals=s=>AX.map(([k])=>s[k]);
+
+/* stage radar for the existing three-draft scores (called from scoreDraw) */
+function stageRadar(){const ax=[['r','Rigor'],['l','Relevance'],['b','Rebuttal-proof']];
+  const ser=D.map((s,i)=>({v:[s.scores.rigor.v,s.scores.relevance.v,s.scores.rebuttal.v],c:SC[i],fo:i==sel?.26:.05,w:i==sel?3.4:1.6,dash:i==sel?'':'5 4'}));
+  ser.push(ser.splice(sel,1)[0]);
+  return`<div class="rcard"><span class="lab">Radar — the three drafts</span>${radar(ser,{ax,max:4,steps:4,size:230,alt:'Radar chart comparing the three drafts on rigor, relevance and resistance to rebuttal'})}<div class="lg">${NAMES.map((n,i)=>`<span><i style="background:${SC[i]}"></i>${n}</span>`).join('')}</div></div>`}
+
+/* attack picker */
+const am=$('atkMenu'),ab=$('atkBtn');
+am.innerHTML=Object.entries(ATK).map(([k,[n,b]])=>`<button role="menuitemradio" aria-checked="${k==atk}" data-k="${k}"><b>${n}</b><span>${b}</span></button>`).join('');
+$('rbAtk').innerHTML=Object.entries(ATK).map(([k,[n]])=>`<button data-k="${k}" aria-pressed="false">${n}</button>`).join('');
+const closeMenu=()=>{am.hidden=true;ab.setAttribute('aria-expanded','false')};
+function setAtk(k){atk=k;$('atkName').textContent=ATK[k][0];am.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',b.dataset.k==k))}
+ab.onclick=e=>{e.stopPropagation();const open=am.hidden;am.hidden=!open;ab.setAttribute('aria-expanded',open)};
+am.onclick=e=>{const b=e.target.closest('button');if(!b)return;setAtk(b.dataset.k);closeMenu();ab.focus()};
+document.addEventListener('click',e=>{if(!am.hidden&&!am.contains(e.target))closeMenu()});
+document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!am.hidden){closeMenu();ab.focus()}});
+$('rbAtk').onclick=e=>{const b=e.target.closest('button');if(!b||rbusy||!R)return;setAtk(b.dataset.k);T={text:R.argument,label:R.label};fireRebut()};
+
+/* the gun: a ghost copy follows the pointer with its muzzle on the cursor; release over the pad or a draft to fire */
+const gun=$('gun'),gh=document.createElement('div');
+const star=Array.from({length:16},(_,i)=>{const r=i%2?11:30,a=i*Math.PI/8;return(Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1)}).join(' ');
+gh.id='ghostGun';gh.hidden=true;gh.innerHTML=gun.innerHTML.replace('<svg ','<svg class="g" ')+`<i class="xh"></i><svg class="fl" viewBox="-32 -32 64 64" aria-hidden="true"><polygon points="${star}" fill="#ffd84a" stroke="#c8372d" stroke-width="2"/><circle r="9" fill="#fff6dc"/></svg>`;
+document.body.append(gh);
+let drag=null,moved=false,lp=[0,0],hintT=0;
+const place=(x,y)=>{gh.style.transform=`translate(${x-6}px,${y-31}px)`};
+const hint=m=>{$('rstat').textContent=m;clearTimeout(hintT);hintT=setTimeout(()=>{if(!rbusy)$('rstat').textContent=''},2800)};
+const targetAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&(el.closest('.note[data-i]')||el.closest('.pad'))};
+const clearAim=()=>document.querySelectorAll('.aim').forEach(e=>e.classList.remove('aim'));
+function aimMark(){const t=targetAt(lp[0],lp[1]);document.querySelectorAll('.aim').forEach(e=>e!==t&&e.classList.remove('aim'));t&&t.classList.add('aim')}
+function goHome(){const r=gun.getBoundingClientRect();gh.classList.add('back');gh.style.transform=`translate(${r.left}px,${r.top}px)`;gh.style.opacity=0;
+  setTimeout(()=>{if(!drag){gh.hidden=true;gun.classList.remove('away')}},520)}
+function scrollLoop(){if(!drag)return;const y=lp[1],h=innerHeight;let d=0;
+  if(y>h-80)d=Math.min(26,(y-(h-80))/3+4);else if(y<80)d=-Math.min(26,(80-y)/3+4);
+  if(d){window.scrollBy({top:d,behavior:'instant'});aimMark()}requestAnimationFrame(scrollLoop)}
+gun.addEventListener('pointerdown',e=>{if(rbusy||e.button>0)return;e.preventDefault();gun.setPointerCapture(e.pointerId);
+  drag={sx:e.clientX,sy:e.clientY};moved=false;lp=[e.clientX,e.clientY];closeMenu();
+  gh.hidden=false;gh.classList.remove('back');gh.style.opacity=1;place(e.clientX,e.clientY);gun.classList.add('away');document.body.classList.add('aiming');scrollLoop()});
+gun.addEventListener('pointermove',e=>{if(!drag)return;lp=[e.clientX,e.clientY];if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6)moved=true;place(e.clientX,e.clientY);aimMark()});
+const release=(e,cancel)=>{if(!drag)return;const t=!cancel&&moved?targetAt(e.clientX,e.clientY):null;drag=null;document.body.classList.remove('aiming');clearAim();
+  if(t)shoot(t,e.clientX,e.clientY);else{goHome();hint(moved&&!cancel?'Missed. Drop it on an argument.':'Drag me onto an argument.')}};
+gun.addEventListener('pointerup',e=>release(e,false));
+gun.addEventListener('pointercancel',e=>release(e,true));
+gun.addEventListener('click',e=>{if(e.detail!==0||rbusy)return; /* keyboard: fire at the pad */
+  const p=document.querySelector('.pad');p.scrollIntoView({block:'center',behavior:'instant'});const r=p.getBoundingClientRect(),x=r.left+r.width*(.45+Math.random()*.4),y=r.top+r.height*(.3+Math.random()*.4);
+  gh.hidden=false;gh.classList.remove('back');gh.style.opacity=1;place(x,y);gun.classList.add('away');shoot(p,x,y)});
+
+function fx(t,x,y){gh.classList.remove('kick');const f=gh.querySelector('.fl');f.classList.remove('on');void gh.offsetWidth;gh.classList.add('kick');f.classList.add('on');
+  const r=t.getBoundingClientRect(),h=document.createElement('i');h.className='hole';h.style.left=(x-r.left)+'px';h.style.top=(y-r.top)+'px';t.append(h);
+  const hs=t.querySelectorAll(':scope>.hole');if(hs.length>6)hs[0].remove();
+  t.classList.remove('hit');void t.offsetWidth;t.classList.add('hit')}
+function shoot(t,x,y){fx(t,x,y);setTimeout(goHome,700);
+  let text,label;
+  if(t.classList.contains('pad')){text=c.value.trim();label='Your argument'}
+  else{const i=+t.dataset.i;text=D&&D[i]?D[i].text:'';label='Draft 0'+(i+1)+' · '+NAMES[i]}
+  if(!text){$('rerr').textContent='Put an argument on the pad first.';return}
+  $('rerr').textContent='';T={text,label};fireRebut()}
+
+async function fireRebut(){if(rbusy)return;rbusy=true;rsel=0;const rb=$('rb');rb.hidden=false;$('rerr2').textContent='';
+  const sk='<div class="ghost"><i></i><i></i><i></i></div>';
+  $('rbMeta').innerHTML=`<span class="lab">Attack · ${esc(ATK[atk][0])} · aimed at: ${esc(T.label)}</span>`;
+  $('rbTgt').innerHTML=`<span class="lab">Target</span><div class="tgtx">${esc(T.text)}</div>`;
+  $('rbTabs').innerHTML='';$('rbCard').innerHTML=sk;$('rbRadar').innerHTML=sk;$('rbMinis').innerHTML=$('rbTbl').innerHTML='';
+  setTimeout(()=>rb.scrollIntoView({behavior:rm?'auto':'smooth'}),520);
+  const t0=Date.now(),iv=setInterval(()=>{$('rstat').textContent='Firing… '+Math.floor((Date.now()-t0)/1000)+'s'},500);
+  try{
+    const r=await fetch('/api/rebut',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({argument:T.text,attack:atk,model:$('mdl').value}),signal:AbortSignal.timeout(130000)});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok||!j||!j.success)throw new Error((j&&j.error)||'The server did not respond. Try again.');
+    R={...j.data,label:T.label};rbDraw()}
+  catch(e){const m=(e&&e.name==='TimeoutError')?'That took too long. Try again.':(e&&e.message)||'Something went wrong. Try again.';
+    $('rerr2').textContent=m;if(R)rbDraw();else{$('rbCard').innerHTML=$('rbRadar').innerHTML=''}}
+  finally{clearInterval(iv);rbusy=false;$('rstat').textContent=''}}
+
+const aimHL=(t,ex)=>{const k=ex?t.indexOf(ex):-1;return k<0?esc(t):esc(t.slice(0,k))+'<mark class="on">'+esc(ex)+'</mark>'+esc(t.slice(k+ex.length))};
+function rbDraw(){const r=R.rebuttals[rsel],A=vals(R.argumentStats),B=vals(r.stats),an=k=>(ATK[k]||[k])[0];
+  $('rbMeta').innerHTML=`<span class="lab">Attack · ${esc(an(R.attack))} · aimed at: ${esc(R.label)}</span>`+(R.weakestPoint?`<div class="interp-sm"><span class="lab">Most exposed spot</span><br>${esc(R.weakestPoint)}</div>`:'');
+  $('rbTgt').innerHTML=`<span class="lab">Target</span><div class="tgtx">${aimHL(R.argument,r.aimedAt)}</div>`;
+  $('rbTabs').innerHTML=R.rebuttals.map((x,i)=>`<button data-i="${i}" aria-pressed="${i==rsel}"><b>0${i+1}</b>${esc(x.title)}</button>`).join('');
+  $('rbTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{rsel=+b.dataset.i;rbDraw()});
+  $('rbCard').className='card';$('rbCard').innerHTML=`<span class="lab">${esc(an(r.attack))}</span><div class="rtext">${esc(r.text)}</div><div class="evid"><b>They might reply:</b> ${esc(r.likelyReply)}</div>`;
+  $('rbRadar').innerHTML=radar([{v:A,c:'#1f2a44',fo:.1,w:2,dash:'6 4'},{v:B,c:'#c8372d',fo:.3}],{size:300,alt:'Radar chart: the argument against rebuttal '+(rsel+1)})
+    +`<div class="lg"><span><i style="background:#1f2a44"></i>Argument · ${avg(A)}</span><span><i style="background:#c8372d"></i>Rebuttal 0${rsel+1} · ${avg(B)}</span></div>`;
+  $('rbMinis').innerHTML=`<div class="mini">${radar([{v:A,c:'#1f2a44',fo:.15,w:2}],{size:120,labels:false,alt:'Argument stats'})}<span>Argument · ${avg(A)}</span></div>`
+    +R.rebuttals.map((x,i)=>`<button class="mini" data-i="${i}" aria-pressed="${i==rsel}" aria-label="Rebuttal ${i+1} stats">${radar([{v:A,c:'#1f2a44',fo:0,w:1.2,dash:'4 3'},{v:vals(x.stats),c:'#c8372d',fo:.3,w:2}],{size:120,labels:false,alt:'Rebuttal '+(i+1)+' stats'})}<span>Rebuttal 0${i+1} · ${avg(vals(x.stats))}</span></button>`).join('');
+  $('rbMinis').querySelectorAll('button').forEach(b=>b.onclick=()=>{rsel=+b.dataset.i;rbDraw()});
+  $('rbTbl').innerHTML=`<table><tr><th></th><th>Argument</th><th>Rebuttal 0${rsel+1}</th><th>Δ</th></tr>${AX.map(([k,l])=>{const d=r.stats[k]-R.argumentStats[k];return`<tr><td>${l}</td><td>${R.argumentStats[k]}</td><td>${r.stats[k]}</td><td class="${d>0?'up':''}">${d>0?'+':''}${d}</td></tr>`}).join('')}</table><div class="lab" style="margin-top:8px">Scores out of 10 · Δ in red = the rebuttal is stronger there than the argument</div>`;
+  $('rbAtk').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k==R.attack))}
+$('rbAgain').onclick=()=>{if(R&&!rbusy){T={text:R.argument,label:R.label};fireRebut()}};
+$('rbClose').onclick=()=>{$('rb').hidden=true;R=null;$('hero').scrollIntoView({behavior:rm?'auto':'smooth'})};
+$('rbCopy').onclick=async()=>{if(!R)return;const b=$('rbCopy'),an=k=>(ATK[k]||[k])[0];
+  const md=`# Rebuttals — ${an(R.attack)}\n\n**Argument (${R.label}):** ${R.argument}\n\n`+(R.weakestPoint?`**Most exposed spot:** ${R.weakestPoint}\n\n`:'')+R.rebuttals.map((x,i)=>`## 0${i+1} ${x.title} (${an(x.attack)})\n\n${x.text}\n\n`+(x.aimedAt?`_Aimed at:_ “${x.aimedAt}”\n\n`:'')+`_They might reply:_ ${x.likelyReply}\n\n`+'Stats: '+AX.map(([k,l])=>l+' '+x.stats[k]).join(', ')+'\n\n').join('')+'_Generated by Steelman (Gemma). Model output can be wrong._\n';
+  try{await navigator.clipboard.writeText(md);b.textContent='COPIED ✓'}catch{b.textContent='Copy failed'}setTimeout(()=>b.textContent='⧉ Copy rebuttals',1500)};
 </script>
 </body></html>

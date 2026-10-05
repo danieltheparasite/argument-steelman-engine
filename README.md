@@ -15,6 +15,11 @@ The browser posts the claim to `/api/steelman`. The server sends one structured 
 ## What the UI shows
 How the claim was interpreted and its type, per-stage weaknesses, objections and improvements, evidence you would need to verify, scores out of 12 (totals computed server-side), and fallacies with the exact flagged phrase underlined in the text. Drafts appear as Gemma writes them (streamed). Stress-test scraps (a strong claim, a false dilemma, a vague claim) show it declining to flatter; a cached example run works without the API. Results export as Markdown or a PNG card. A 26B/31B toggle switches Gemma sizes.
 
+## Rebuttal range (gun)
+In the side column, under the "Drag the gun onto an argument" text, there is a gun. Drag it (the barrel tip is the crosshair) onto the pad, or onto one of the three drafts on the board, and let go to fire. Press Enter on the focused gun to fire at the pad with the keyboard. The **Attack** button picks the style: Surprise me, Logical flaws, Evidence challenge, Counterexample, Reductio, Values & ethics, Feasibility.
+
+The browser posts `{ argument, attack, model }` to `/api/rebut`. Gemma returns three rebuttals plus six 0-10 stats (logic, evidence, clarity, relevance, impact, resilience) for the argument and for each rebuttal. The UI draws them as radar charts: argument vs the selected rebuttal, a mini radar per rebuttal, and a table of differences. The three-draft score panel also gets a radar. Files: `app/api/rebut/route.ts`, `runRebut` in `lib/ai.ts`, rebuttal schema in `lib/schema.ts`, attack prompts in `lib/prompts.ts`.
+
 ## Evaluate
 `npm run dev`, then `npm run eval` (or `node scripts/eval.mjs https://your-site`). It checks stage count, totals, score ranges, that every flagged excerpt really appears in the text, no invented URLs, and a few expected behaviours. Model output varies, so treat failures as prompts to review.
 

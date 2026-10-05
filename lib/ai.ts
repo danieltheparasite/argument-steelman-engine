@@ -1,7 +1,7 @@
 // Provider code: one call per analysis, cached, de-duplicated, loop-guarded.
 import { GoogleGenAI } from "@google/genai";
-import { ModelOutputSchema, modelJsonSchema } from "./schema";
-import { SYSTEM_PROMPT, buildPrompt } from "./prompts";
+import { ModelOutputSchema, modelJsonSchema, RebutOutputSchema, rebutJsonSchema } from "./schema";
+import { SYSTEM_PROMPT, buildPrompt, REBUT_SYSTEM, buildRebutPrompt, type AttackId } from "./prompts";
 import type { Analysis } from "@/types/steelman";
 
 export class AppError extends Error {
@@ -137,4 +137,66 @@ export function runSteelman(claim: string, o: Opts): Promise<Analysis> {
   const p = generate(claim, o).then((v) => { remember(claim, o, v); return v; }).finally(() => inflight.delete(k));
   inflight.set(k, p);
   return p;
+}
+
+/* ===== Rebuttal range: one call, three rebuttals, radar stats for the argument and each rebuttal ===== */
+const REBUT_SCHEMA = rebutJsonSchema();
+const STAT_KEYS = ["logic", "evidence", "clarity", "relevance", "impact", "resilience"] as const;
+type Stats = Record<(typeof STAT_KEYS)[number], number>;
+export type RebutResult = {
+  argument: string; attack: AttackId; argumentStats: Stats; weakestPoint: string;
+  rebuttals: { title: string; attack: AttackId; aimedAt: string; text: string; likelyReply: string; stats: Stats }[];
+};
+const roundStats = (s: Stats): Stats => Object.fromEntries(STAT_KEYS.map((k) => [k, Math.round(Math.min(10, Math.max(0, s[k])))])) as Stats;
+
+function fatal(e: unknown): AppError | null {
+  const m = String((e as Error)?.message ?? e);
+  if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return new AppError("Rate limit reached. Wait a minute and try again.", 429);
+  if (/API_KEY_INVALID|API key not valid|401|UNAUTHENTICATED/i.test(m)) return new AppError("Google rejected the API key. Create a new key and update GEMINI_API_KEY.", 502);
+  if (/403|PERMISSION/i.test(m)) return new AppError("This key can't use that model. Check AI_MODEL and your key's access.", 502);
+  if (/404|NOT_FOUND/i.test(m)) return new AppError("AI_MODEL was not found. Check the id in .env.local.", 502);
+  if (/timeout|DEADLINE|aborted|fetch failed|ENOTFOUND/i.test(m)) return new AppError("The AI service did not respond in time. Try again.", 504);
+  return null;
+}
+
+export async function runRebut(argument: string, attack: AttackId, modelKey?: string): Promise<RebutResult> {
+  const key = process.env.GEMINI_API_KEY;
+  const model = modelFor(modelKey) ?? resolved ?? process.env.AI_MODEL;
+  if (!key || !model) throw new AppError("Server is missing GEMINI_API_KEY or AI_MODEL. See the README.", 500);
+  client ??= new GoogleGenAI({ apiKey: key });
+  const prompt = `${buildRebutPrompt(argument, attack)}\n\nReturn ONLY raw JSON matching this schema:\n${JSON.stringify(REBUT_SCHEMA)}`;
+  const inline = `${REBUT_SYSTEM}\n\n${prompt}`;
+  const base = { topP: 0.95, topK: 64, maxOutputTokens: 4096, httpOptions: { timeout: 100000 } };
+  const tries = [
+    { contents: prompt, config: { ...base, temperature: 0.8, systemInstruction: REBUT_SYSTEM } },
+    { contents: inline, config: { ...base, temperature: 0.9 } },
+  ];
+  for (let i = startAt; i < tries.length; i++) {
+    let text = "", finish = "";
+    try {
+      const r = await client.models.generateContent({ model, contents: tries[i].contents, config: tries[i].config as never });
+      text = r.text ?? ""; finish = String(r.candidates?.[0]?.finishReason ?? "");
+    } catch (e) {
+      log(`rebut attempt ${i} failed (${model}):`, String((e as Error)?.message ?? e).slice(0, 300));
+      const f = fatal(e); if (f) throw f;
+      continue;
+    }
+    if (!text || /MAX_TOKENS/i.test(finish) || looping(text)) { log("rebut: empty, truncated or looping output"); continue; }
+    const p = RebutOutputSchema.safeParse(extractJson(text));
+    if (!p.success) { log("rebut schema mismatch:", JSON.stringify(p.error.issues.slice(0, 2))); continue; }
+    resolved = model;
+    const lower = argument.toLowerCase();
+    return {
+      argument, attack, weakestPoint: p.data.weakestPoint, argumentStats: roundStats(p.data.argumentStats),
+      rebuttals: p.data.rebuttals.map((r) => {
+        const at = lower.indexOf(r.aimedAt.trim().toLowerCase());
+        return {
+          title: r.title, text: r.text, likelyReply: r.likelyReply, stats: roundStats(r.stats),
+          attack: r.attack === "mixed" ? (attack === "mixed" ? "logic" : attack) : r.attack,
+          aimedAt: r.aimedAt.trim() && at >= 0 ? argument.slice(at, at + r.aimedAt.trim().length) : "", // only real excerpts
+        };
+      }),
+    };
+  }
+  throw new AppError("The model couldn't produce clean rebuttals. Try again.", 502);
 }
