@@ -102,3 +102,12 @@ export function rebutJsonSchema() {
   delete s.$schema;
   return s;
 }
+
+/* ===== Image -> argument text ===== */
+export const ImageRequestSchema = z.object({
+  image: z.string().min(200, "That image looks empty.")
+    .max(4_000_000, "That image is too large. Try a smaller screenshot.")
+    .regex(/^[A-Za-z0-9+/=]+$/, "Malformed image."),
+  mime: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  model: z.enum(["26b", "31b"]).optional(),
+});

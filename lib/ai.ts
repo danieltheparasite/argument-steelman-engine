@@ -1,7 +1,7 @@
 // Provider code: one call per analysis, cached, de-duplicated, loop-guarded.
 import { GoogleGenAI } from "@google/genai";
-import { ModelOutputSchema, modelJsonSchema, RebutOutputSchema, rebutJsonSchema } from "./schema";
-import { SYSTEM_PROMPT, buildPrompt, REBUT_SYSTEM, buildRebutPrompt, type AttackId } from "./prompts";
+import { ModelOutputSchema, modelJsonSchema, RebutOutputSchema, rebutJsonSchema, MAX_CLAIM_LENGTH } from "./schema";
+import { SYSTEM_PROMPT, buildPrompt, REBUT_SYSTEM, buildRebutPrompt, OCR_PROMPT, type AttackId } from "./prompts";
 import type { Analysis } from "@/types/steelman";
 
 export class AppError extends Error {
@@ -199,4 +199,28 @@ export async function runRebut(argument: string, attack: AttackId, modelKey?: st
     };
   }
   throw new AppError("The model couldn't produce clean rebuttals. Try again.", 502);
+}
+
+
+/* ===== Image -> argument text (Gemma 4 accepts image input through the Gemini API) ===== */
+export async function readImage(image: string, mime: string, modelKey?: string): Promise<{ text: string; truncated: boolean }> {
+  const key = process.env.GEMINI_API_KEY;
+  const model = modelFor(modelKey) ?? resolved ?? process.env.AI_MODEL;
+  if (!key || !model) throw new AppError("Server is missing GEMINI_API_KEY or AI_MODEL. See the README.", 500);
+  client ??= new GoogleGenAI({ apiKey: key });
+  let raw = "";
+  try {
+    const r = await client.models.generateContent({
+      model,
+      contents: [{ role: "user", parts: [{ inlineData: { mimeType: mime, data: image } }, { text: OCR_PROMPT }] }],
+      config: { temperature: 0.1, maxOutputTokens: 2048, httpOptions: { timeout: 100000 } } as never,
+    });
+    raw = r.text ?? "";
+  } catch (e) {
+    log("image read failed:", String((e as Error)?.message ?? e).slice(0, 300));
+    throw fatal(e) ?? new AppError("The model couldn't read that image. Try a clearer one.", 502);
+  }
+  const t = raw.replace(/^```\w*\n?/, "").replace(/```\s*$/, "").trim();
+  if (!t || /^NO_ARGUMENT\b/i.test(t) || looping(t)) throw new AppError("No readable argument found in that image.", 422);
+  return t.length > MAX_CLAIM_LENGTH ? { text: t.slice(0, MAX_CLAIM_LENGTH), truncated: true } : { text: t, truncated: false };
 }

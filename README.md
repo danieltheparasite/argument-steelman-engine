@@ -20,6 +20,11 @@ In the side column, under the "Drag the gun onto an argument" text, there is a g
 
 The browser posts `{ argument, attack, model }` to `/api/rebut`. Gemma returns three rebuttals plus six 0-10 stats (logic, evidence, clarity, relevance, impact, resilience) for the argument and for each rebuttal. The UI draws them as radar charts: argument vs the selected rebuttal, a mini radar per rebuttal, and a table of differences. The three-draft score panel also gets a radar. Files: `app/api/rebut/route.ts`, `runRebut` in `lib/ai.ts`, rebuttal schema in `lib/schema.ts`, attack prompts in `lib/prompts.ts`.
 
+## Image input
+Paste (Ctrl+V), drop, or attach (📎 image) a screenshot or photo of an argument. The browser downscales it to at most 1600 px and posts it to `/api/read-image`; Gemma transcribes the text and it lands in the pad for you to check before analyzing. Text on the clipboard always wins over an image. The server accepts PNG, JPEG or WebP only, checks the file's real bytes against the declared type, caps the size (about 4 MB after encoding, which is the Vercel request limit) and replies "No readable argument" when the image has none. Files: `app/api/read-image/route.ts`, `readImage` in `lib/ai.ts`, `OCR_PROMPT` in `lib/prompts.ts`.
+
+The gun is a 32x32 pixel-art rifle drawn as an inline SVG in `public/desk.html`. Its barrel tip is the crosshair; `--mx` and `--my` in the CSS set that point if you swap the artwork.
+
 ## Evaluate
 `npm run dev`, then `npm run eval` (or `node scripts/eval.mjs https://your-site`). It checks stage count, totals, score ranges, that every flagged excerpt really appears in the text, no invented URLs, and a few expected behaviours. Model output varies, so treat failures as prompts to review.
 

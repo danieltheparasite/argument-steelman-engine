@@ -180,22 +180,22 @@ mark{background:none;color:inherit;text-decoration:underline wavy var(--red);tex
 /* ===== Rebuttal range: gun, attack menu, bullet holes, radars ===== */
 .range{padding:14px 16px 16px;border:2px dashed var(--lead);border-radius:6px;max-width:330px;position:relative;margin-bottom:14px}
 .rtxt{margin:6px 0 2px;font:700 23px/1.1 'Caveat',cursive;color:var(--txt)}
-.gun{all:unset;display:block;width:150px;margin:8px 0 2px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
-  transition:transform .2s cubic-bezier(.3,1.6,.5,1),opacity .2s;filter:drop-shadow(0 6px 3px var(--sh))}
+.gun{all:unset;display:block;width:var(--gw);margin:10px 0 2px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:transform .2s cubic-bezier(.3,1.6,.5,1),opacity .2s;filter:var(--stk) drop-shadow(0 8px 4px var(--sh))}
 .gun svg{display:block;width:100%;height:auto;pointer-events:none}
-.gun:hover{transform:rotate(-6deg) translateY(-3px)}.gun:focus-visible{outline:2px dashed var(--red);outline-offset:6px}
+.gun:hover{transform:rotate(-4deg) scale(1.05)}.gun:focus-visible{outline:2px dashed var(--red);outline-offset:6px}
 .gun.away{opacity:.22}.gun,.gun:hover{cursor:grab!important}
 body.aiming,body.aiming *{cursor:crosshair!important;-webkit-user-select:none;user-select:none}
-#ghostGun{position:fixed;left:0;top:0;width:150px;height:90px;z-index:1000;pointer-events:none;will-change:transform;filter:drop-shadow(0 14px 8px rgba(0,0,0,.35))}
-#ghostGun svg.g{display:block;width:100%;height:auto;transform-origin:78% 62%}
+#ghostGun{position:fixed;left:0;top:0;width:var(--gw);height:var(--gw);z-index:1000;pointer-events:none;will-change:transform;filter:var(--stk) drop-shadow(0 16px 8px rgba(0,0,0,.35))}
+#ghostGun svg.g{display:block;width:100%;height:auto;transform-origin:85% 85%}
 #ghostGun.back{transition:transform .5s cubic-bezier(.3,1.15,.4,1),opacity .5s}
 #ghostGun.kick svg.g{animation:kick .34s ease-out}
-@keyframes kick{30%{transform:rotate(-17deg) translateX(14px)}}
-#ghostGun .xh{position:absolute;left:-8px;top:17px;width:28px;height:28px;border:2px solid var(--red);border-radius:50%;opacity:.9}
+@keyframes kick{30%{transform:translate(13px,13px) rotate(5deg)}}
+#ghostGun .xh{position:absolute;left:calc(var(--mx) - 14px);top:calc(var(--my) - 14px);width:28px;height:28px;border:2px solid var(--red);border-radius:50%;opacity:.9}
 #ghostGun .xh:before,#ghostGun .xh:after{content:"";position:absolute;background:var(--red)}
 #ghostGun .xh:before{left:50%;top:-6px;bottom:-6px;width:2px;margin-left:-1px}
 #ghostGun .xh:after{top:50%;left:-6px;right:-6px;height:2px;margin-top:-1px}
-#ghostGun .fl{position:absolute;left:-26px;top:-1px;width:64px;height:64px;opacity:0}
+#ghostGun .fl{position:absolute;left:calc(var(--mx) - 32px);top:calc(var(--my) - 32px);width:64px;height:64px;opacity:0}
 #ghostGun .fl.on{animation:flash .3s ease-out}
 @keyframes flash{0%{opacity:1;transform:scale(.3)}40%{opacity:1;transform:scale(1.25)}100%{opacity:0;transform:scale(1.5)}}
 .aim{outline:3px dashed var(--red);outline-offset:7px}
@@ -242,6 +242,22 @@ button.mini{cursor:pointer}button.mini:hover{transform:translateY(-3px)}
 .mini .radar{max-height:none}
 .mini span{display:block;margin-top:2px}
 td.up{color:var(--red);font-weight:bold}
+
+/* rifle sprite: sticker outline, idle sway, blinking scope LED; --mx/--my = barrel tip inside the sprite box */
+:root{--gw:176px;--mx:9px;--my:9px;--stk:drop-shadow(2px 0 0 var(--paper)) drop-shadow(-2px 0 0 var(--paper)) drop-shadow(0 2px 0 var(--paper)) drop-shadow(0 -2px 0 var(--paper))}
+.gun svg{animation:sway 4s ease-in-out infinite;transform-origin:85% 85%}
+.gun.away svg{animation:none}
+@keyframes sway{50%{transform:rotate(-2.2deg) translateY(-3px)}}
+.dot{animation:led 1.5s ease-in-out infinite}
+.halo{opacity:.0;transform-box:fill-box;transform-origin:center;animation:halo 1.5s ease-in-out infinite}
+@keyframes led{50%{opacity:.45}}
+@keyframes halo{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.5;transform:scale(1)}}
+/* image attach */
+.att{all:unset;cursor:pointer;font:13px 'Special Elite',monospace;color:#8f8a7c;padding:3px 8px;border:1.5px dashed #8f8a7c;border-radius:2px;-webkit-tap-highlight-color:transparent}
+.att:hover{color:#241f1a;border-color:#241f1a}.att:focus-visible{outline:2px dashed var(--red);outline-offset:2px}.att:disabled{opacity:.5;cursor:wait}
+.lft{display:flex;gap:12px;align-items:center}
+.pad.drop{outline:3px dashed var(--red);outline-offset:8px}
+#istat{margin-top:8px;min-height:16px}
 </style></head>
 <body>
 <div class="wrap">
@@ -253,17 +269,17 @@ td.up{color:var(--red);font-weight:bold}
   <div class="stage">
     <div>
       <div class="pad">
-        <textarea id="claim" maxlength="1500" placeholder="Write your argument here…" aria-label="Your argument"></textarea>
-        <div class="row"><span class="cnt" id="cnt">0 / 1500</span><button class="btn" id="go">Analyze →</button></div>
+        <textarea id="claim" maxlength="1500" placeholder="Write your argument here… or paste an image of it" aria-label="Your argument"></textarea>
+        <div class="row"><span class="lft"><span class="cnt" id="cnt">0 / 1500</span><button type="button" class="att" id="att" title="Attach, paste or drop an image of your argument" aria-label="Attach an image of your argument">📎 image</button><input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden></span><button class="btn" id="go">Analyze →</button></div>
       </div>
       <div class="opts"><span class="lab">mode</span><button class="opt" data-m="mine" aria-pressed="true">Strengthen my argument</button><button class="opt" data-m="other" aria-pressed="false">Steelman the other side</button>
         <select id="mdl" aria-label="Model"><option value="26b">Gemma 26B · fast</option><option value="31b">Gemma 31B · deeper</option></select></div>
-      <div class="err" id="err" role="alert"></div><div class="lab" id="stat" aria-live="polite"></div>
+      <div class="lab" id="istat" aria-live="polite"></div><div class="err" id="err" role="alert"></div><div class="lab" id="stat" aria-live="polite"></div>
     </div>
     <div class="ex" id="ex"><div class="range" id="range">
         <span class="lab">rebuttal range</span>
         <p class="rtxt">Drag the gun onto an argument.<br>Pull the trigger. Get rebuttals.</p>
-        <button class="gun" id="gun" aria-label="Rebuttal gun. Drag it onto your argument to fire, or press Enter to fire at the pad."><svg viewBox="0 0 150 90" aria-hidden="true"><g stroke="#1f2a44" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M104 40 L132 40 Q139 40 137 47 L127 82 Q125 87 119 87 L103 87 Q97 87 98.5 81 Z" fill="#a97f52"/><path d="M60 24 H112 Q125 24 125 35 V42 H104 L98 53 H78 L74 42 H60 Z" fill="#8a877e"/><rect x="6" y="24" width="60" height="14" rx="3" fill="#3a4663"/><rect x="8" y="17" width="7" height="8" rx="1.5" fill="#3a4663"/><rect x="62" y="18" width="30" height="26" rx="5" fill="#a8a498"/><path d="M72 20v22M82 20v22" fill="none" stroke-width="1.6"/><path d="M116 25 L124 11 L131 16 L125 29 Z" fill="#3a4663"/><path d="M78 42 Q80 63 99 58 L101 46" fill="none"/><path d="M93 45 L89 55" fill="none"/><rect x="7" y="29" width="58" height="3.4" fill="#c8372d" stroke="none"/></g></svg></button>
+        <button class="gun" id="gun" aria-label="Rebuttal gun. Drag it onto your argument to fire, or press Enter to fire at the pad."><svg viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true"><path fill="#0e0f13" d="M0 0h3v1h-3zM0 1h4v1h-4zM0 2h4v1h-4zM1 3h2v1h-2zM4 3h1v1h-1zM3 4h1v1h-1zM5 4h1v1h-1zM4 5h1v1h-1zM6 5h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1zM7 8h1v1h-1zM9 8h1v1h-1zM8 9h1v1h-1zM10 9h1v1h-1zM9 10h1v1h-1zM11 10h2v1h-2zM10 11h1v1h-1zM13 11h3v1h-3zM19 11h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM18 12h3v1h-3zM11 13h1v1h-1zM13 13h1v1h-1zM15 13h1v1h-1zM17 13h1v1h-1zM19 13h1v1h-1zM21 13h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM12 16h1v1h-1zM14 16h1v1h-1zM18 16h1v1h-1zM20 16h1v1h-1zM22 16h1v1h-1zM24 16h1v1h-1zM13 17h1v1h-1zM15 17h1v1h-1zM19 17h1v1h-1zM21 17h1v1h-1zM23 17h1v1h-1zM25 17h1v1h-1zM15 18h1v1h-1zM20 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM26 18h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM21 19h1v1h-1zM23 19h1v1h-1zM25 19h1v1h-1zM13 20h1v1h-1zM17 20h1v1h-1zM22 20h1v1h-1zM13 21h1v1h-1zM17 21h1v1h-1zM19 21h2v1h-2zM23 21h1v1h-1zM14 22h1v1h-1zM18 22h1v1h-1zM21 22h1v1h-1zM24 22h1v1h-1zM15 23h1v1h-1zM17 23h1v1h-1zM19 23h4v1h-4zM25 23h1v1h-1zM16 24h1v1h-1zM20 24h1v1h-1zM23 24h1v1h-1zM26 24h1v1h-1zM19 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM27 25h1v1h-1zM19 26h1v1h-1zM21 26h1v1h-1zM25 26h1v1h-1zM28 26h1v1h-1zM18 27h1v1h-1zM21 27h1v1h-1zM25 27h1v1h-1zM27 27h1v1h-1zM29 27h1v1h-1zM19 28h2v1h-2zM24 28h1v1h-1zM26 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM25 29h1v1h-1zM27 29h1v1h-1zM29 29h1v1h-1zM31 29h1v1h-1zM26 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM27 31h3v1h-3z"/><path fill="#272a31" d="M20 13h1v1h-1zM11 14h1v1h-1zM21 14h1v1h-1zM12 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM13 16h1v1h-1zM23 16h1v1h-1zM24 17h1v1h-1zM23 18h1v1h-1zM25 18h1v1h-1zM15 20h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM16 23h1v1h-1zM25 28h1v1h-1z"/><path fill="#41454e" d="M3 3h1v1h-1zM4 4h1v1h-1zM5 5h1v1h-1zM6 6h1v1h-1zM7 7h1v1h-1zM8 8h1v1h-1zM9 9h1v1h-1zM10 10h1v1h-1zM11 11h1v1h-1zM11 12h1v1h-1zM12 13h1v1h-1zM13 14h2v1h-2zM14 15h2v1h-2zM15 16h2v1h-2zM16 17h2v1h-2zM16 18h3v1h-3zM15 19h1v1h-1zM17 19h3v1h-3zM14 20h1v1h-1zM16 20h1v1h-1zM18 20h3v1h-3zM15 21h1v1h-1zM18 21h1v1h-1zM21 21h1v1h-1zM16 22h1v1h-1zM22 22h1v1h-1zM23 23h1v1h-1zM21 24h2v1h-2zM24 24h1v1h-1zM20 25h2v1h-2zM25 25h1v1h-1zM20 26h1v1h-1zM26 26h1v1h-1zM19 27h2v1h-2zM26 27h1v1h-1zM26 29h1v1h-1zM27 30h1v1h-1zM29 30h1v1h-1z"/><path fill="#868b96" d="M12 11h1v1h-1zM13 12h1v1h-1zM15 12h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1zM15 14h1v1h-1zM17 14h1v1h-1zM16 15h1v1h-1zM18 15h1v1h-1zM17 16h1v1h-1zM19 16h1v1h-1zM18 17h1v1h-1zM20 17h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM20 19h1v1h-1zM22 19h1v1h-1zM21 20h1v1h-1zM22 21h1v1h-1zM23 22h1v1h-1zM24 23h1v1h-1zM25 24h1v1h-1zM26 25h1v1h-1zM27 26h1v1h-1zM28 27h1v1h-1zM29 28h1v1h-1zM30 29h1v1h-1z"/><path fill="#c4e7f3" d="M18 13h1v1h-1zM19 14h1v1h-1zM21 16h1v1h-1zM22 17h1v1h-1zM19 22h2v1h-2zM27 28h1v1h-1zM28 29h1v1h-1z"/><circle class="halo" cx="19.5" cy="12.5" r="2.6" fill="#3dff7a"/><rect class="dot" x="19" y="12" width="1" height="1" fill="#22d35a"/></svg></button>
         <div class="atk"><button class="btn ghost sm" id="atkBtn" aria-haspopup="true" aria-expanded="false">⚔ Attack: <b id="atkName">Surprise me</b> ▾</button><div class="menu" id="atkMenu" role="menu" hidden></div></div>
         <span class="lab" id="rstat" aria-live="polite"></span>
         <div class="err" id="rerr" role="alert"></div>
@@ -481,7 +497,8 @@ const star=Array.from({length:16},(_,i)=>{const r=i%2?11:30,a=i*Math.PI/8;return
 gh.id='ghostGun';gh.hidden=true;gh.innerHTML=gun.innerHTML.replace('<svg ','<svg class="g" ')+`<i class="xh"></i><svg class="fl" viewBox="-32 -32 64 64" aria-hidden="true"><polygon points="${star}" fill="#ffd84a" stroke="#c8372d" stroke-width="2"/><circle r="9" fill="#fff6dc"/></svg>`;
 document.body.append(gh);
 let drag=null,moved=false,lp=[0,0],hintT=0;
-const place=(x,y)=>{gh.style.transform=`translate(${x-6}px,${y-31}px)`};
+const cs0=getComputedStyle(document.documentElement),MX=parseFloat(cs0.getPropertyValue('--mx')),MY=parseFloat(cs0.getPropertyValue('--my'));
+const place=(x,y)=>{gh.style.transform=`translate(${x-MX}px,${y-MY}px)`};
 const hint=m=>{$('rstat').textContent=m;clearTimeout(hintT);hintT=setTimeout(()=>{if(!rbusy)$('rstat').textContent=''},2800)};
 const targetAt=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&(el.closest('.note[data-i]')||el.closest('.pad'))};
 const clearAim=()=>document.querySelectorAll('.aim').forEach(e=>e.classList.remove('aim'));
@@ -549,5 +566,39 @@ $('rbClose').onclick=()=>{$('rb').hidden=true;R=null;$('hero').scrollIntoView({b
 $('rbCopy').onclick=async()=>{if(!R)return;const b=$('rbCopy'),an=k=>(ATK[k]||[k])[0];
   const md=`# Rebuttals — ${an(R.attack)}\n\n**Argument (${R.label}):** ${R.argument}\n\n`+(R.weakestPoint?`**Most exposed spot:** ${R.weakestPoint}\n\n`:'')+R.rebuttals.map((x,i)=>`## 0${i+1} ${x.title} (${an(x.attack)})\n\n${x.text}\n\n`+(x.aimedAt?`_Aimed at:_ “${x.aimedAt}”\n\n`:'')+`_They might reply:_ ${x.likelyReply}\n\n`+'Stats: '+AX.map(([k,l])=>l+' '+x.stats[k]).join(', ')+'\n\n').join('')+'_Generated by Steelman (Gemma). Model output can be wrong._\n';
   try{await navigator.clipboard.writeText(md);b.textContent='COPIED ✓'}catch{b.textContent='Copy failed'}setTimeout(()=>b.textContent='⧉ Copy rebuttals',1500)};
+</script>
+<script>
+/* ===== Image in, argument text out: paste, drop or attach an image; Gemma transcribes it into the pad ===== */
+let imgBusy=false;
+async function imgToJpeg(file){const bmp=await createImageBitmap(file),k=Math.min(1,1600/Math.max(bmp.width,bmp.height)),cv=document.createElement('canvas');
+  cv.width=Math.max(1,Math.round(bmp.width*k));cv.height=Math.max(1,Math.round(bmp.height*k));
+  const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(bmp,0,0,cv.width,cv.height);
+  return cv.toDataURL('image/jpeg',.88).split(',')[1]}
+async function readImg(file){if(imgBusy)return;const err=$('err'),st=$('istat');err.textContent='';
+  if(!/^image\/(png|jpe?g|webp)$/.test(file.type)){err.textContent='Use a PNG, JPEG or WebP image.';return}
+  if(file.size>15e6){err.textContent='That image is too large (15 MB max).';return}
+  imgBusy=true;$('att').disabled=true;const t0=Date.now(),iv=setInterval(()=>{st.textContent='Reading the image… '+Math.floor((Date.now()-t0)/1000)+'s'},400);st.textContent='Reading the image…';
+  let msg='';
+  try{
+    const data=await imgToJpeg(file);
+    const r=await fetch('/api/read-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:data,mime:'image/jpeg',model:$('mdl').value}),signal:AbortSignal.timeout(130000)});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok||!j||!j.success)throw new Error((j&&j.error)||'The server did not respond. Try again.');
+    const cur=c.value.trim(),all=(cur?cur+'\n\n':'')+j.data.text,cut=j.data.truncated||all.length>1500;
+    c.value=all.slice(0,1500);c.oninput();c.focus();
+    msg=cut?'Image read, but trimmed to 1500 characters. Check the text.':'Image read. Check the text before analyzing.'}
+  catch(e){err.textContent=(e&&e.name==='TimeoutError')?'That took too long. Try again.':(e&&e.name==='InvalidStateError')?"That image couldn't be opened.":(e&&e.message)||'Something went wrong. Try again.'}
+  finally{clearInterval(iv);imgBusy=false;$('att').disabled=false;st.textContent=msg;if(msg)setTimeout(()=>{if(st.textContent==msg)st.textContent=''},6000)}}
+document.addEventListener('paste',e=>{const cd=e.clipboardData;if(!cd)return;
+  const it=[...cd.items].find(i=>i.kind==='file'&&i.type.startsWith('image/'));
+  if(!it||cd.getData('text/plain'))return; /* real text on the clipboard wins */
+  const f=it.getAsFile();if(f){e.preventDefault();readImg(f)}});
+const padEl=document.querySelector('.pad');
+['dragenter','dragover'].forEach(t=>padEl.addEventListener(t,e=>{if([...(e.dataTransfer?.types||[])].includes('Files')){e.preventDefault();padEl.classList.add('drop')}}));
+padEl.addEventListener('dragleave',()=>padEl.classList.remove('drop'));
+padEl.addEventListener('drop',e=>{padEl.classList.remove('drop');const fl=e.dataTransfer&&e.dataTransfer.files;if(!fl||!fl.length)return;e.preventDefault();
+  const f=[...fl].find(x=>x.type.startsWith('image/'));f?readImg(f):($('err').textContent='Drop an image file (PNG, JPEG or WebP).')});
+$('att').onclick=()=>$('file').click();
+$('file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)readImg(f)};
 </script>
 </body></html>
